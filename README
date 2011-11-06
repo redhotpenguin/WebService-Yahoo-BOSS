@@ -1,0 +1,45 @@
+NAME
+    WebService::Yahoo::BOSS - Interface to the Yahoo BOSS API
+
+SYNOPSIS
+     use WebService::Yahoo::BOSS;
+
+     # props out to the original boss Bruce Springsteen
+     $Boss = WebService::Yahoo::BOSS->new( appid => $appid );
+
+     $res = $Boss->Web( query   => 'microbrew award winner 2010',
+                        exclude => 'pilsner', );
+
+     # todo - add pluggable xml/json parser
+     foreach my $hit ( @{$res ) {
+         print $hit->url, $hit->title; # etc..
+     }
+
+DESCRIPTION
+    This API wraps the Yahoo BOSS (Build Your Own Search) web service API.
+
+    Mad props to Yahoo for putting out a premium search api which encourages
+    innovative use.
+
+    For more information check out the following links. This is a work in
+    progress, so patches welcome!
+
+    The low level request structure is as follows:
+
+     http://boss.yahooapis.com/ysearch/{vertical}/v1/{query}?appid=xyz[&param1=val1&param2=val2&etc]
+
+SEE ALSO
+     http://developer.yahoo.com/search/boss/boss_guide/overview.html
+
+     L<Google::Search>
+
+AUTHOR
+    "Fred Moyer", <fred@slwifi.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Silver Lining Networks
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

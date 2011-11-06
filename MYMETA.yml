@@ -1,0 +1,28 @@
+---
+abstract: 'Interface to the Yahoo BOSS API'
+author:
+  - 'Fred Moyer <fred@slwifi.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: WebService-Yahoo-BOSS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Any::Moose: 0
+  Any::URI::Escape: 0
+  Data::UUID: 1.217
+  JSON::XS: 2.32
+  LWP::UserAgent: 0
+  Net::OAuth: 0.27
+version: 0.07
