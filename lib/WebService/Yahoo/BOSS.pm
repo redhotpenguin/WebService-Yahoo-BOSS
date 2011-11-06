@@ -58,8 +58,8 @@ sub Web {
 
     # Create request
     my $request = Net::OAuth->request("request token")->new(
-        consumer_key     => $args{ckey},
-        consumer_secret  => $args{csecret},
+        consumer_key     => $self->ckey,
+        consumer_secret  => $self->csecret,
         request_url      => $url,
         request_method   => 'GET',
         signature_method => 'HMAC-SHA1',
