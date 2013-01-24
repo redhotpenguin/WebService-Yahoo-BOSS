@@ -18,7 +18,7 @@ use Data::Dumper;
 use Data::UUID;
 use WebService::Yahoo::BOSS::Response;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our $Ua = LWP::UserAgent->new( agent => __PACKAGE__ . '_' . $VERSION );
 
@@ -46,7 +46,7 @@ sub Web {
     }
 
     $args{format} ||= 'json';
-    $args{count} = 10;
+    $args{count} || = 10;
     die 'only json format supported, xml patches welcome'
       unless $args{format} eq 'json';
 

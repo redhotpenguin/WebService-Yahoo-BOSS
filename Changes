@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-Yahoo-BOSS.
 
+0.08  Thu Jan 24 2013
+    - Allow count to be passed via args [Achim Ruopp]
+
 0.07  Sun Nov 06 2011
     - Fix error in query method introduced with V2 compat update.
 
