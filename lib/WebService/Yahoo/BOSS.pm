@@ -7,20 +7,19 @@ WebService::Yahoo::BOSS - Interface to the Yahoo BOSS API
 =cut
 
 use Moo;
+
 use Any::URI::Escape;
 use LWP::UserAgent;
 use URI;
 use Net::OAuth;
 use Data::Dumper;
 use Data::UUID;
+use Carp qw(croak);
+
 use WebService::Yahoo::BOSS::Response;
+use WebService::Yahoo::BOSS::Response::Web;
 
 our $VERSION = '0.08';
-
-our $Ua = LWP::UserAgent->new( agent => __PACKAGE__ . '_' . $VERSION );
-
-our $Api_host = 'yboss.yahooapis.com';
-our $Api_base = "http://$Api_host";
 
 my $Ug = Data::UUID->new;
 
@@ -28,58 +27,87 @@ $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
 has 'ckey'    => ( is => 'ro', required => 1 );
 has 'csecret' => ( is => 'ro', required => 1 );
+
 has 'url'     => (
     is       => 'ro',
-    required => 1,
-    default  => $Api_base,
+    default  => "http://yboss.yahooapis.com",
 );
 
-sub Web {
-    my ( $self, %args ) = @_;
-
-    unless ( $args{q} && ( $args{q} ne '' ) ) {
-        die "query param needed to search";
+has 'ua' => (
+    is => 'ro',
+    default => sub {
+        LWP::UserAgent->new(
+            agent => __PACKAGE__ . '_' . $VERSION,
+            keep_alive => 1, # cache connection
+        );
     }
+);
 
-    $args{format} ||= 'json';
-    $args{count} ||= 10;
-    die 'only json format supported, xml patches welcome'
-      unless $args{format} eq 'json';
 
-    $args{filter} = '-porn';
-
-    # build the endpoint
-    my $url  = $self->url . '/ysearch/web';
-    my $uuid = $Ug->to_string( $Ug->create() );
+sub _create_boss_request {
+    my ($self, $api_path, $args) = @_;
 
     # Create request
     my $request = Net::OAuth->request("request token")->new(
         consumer_key     => $self->ckey,
         consumer_secret  => $self->csecret,
-        request_url      => $url,
+        request_url      => $self->url . $api_path,
         request_method   => 'GET',
         signature_method => 'HMAC-SHA1',
         timestamp        => time,
-        nonce            => $uuid,
-        extra_params     => \%args,
-        callback         => 'http://printer.example.com/request_token_ready',
+        nonce            => $Ug->to_string( $Ug->create ),
+        extra_params     => $args,
+        callback         => '',
     );
 
-    # Sign request
     $request->sign;
 
-    # Get message to the Service Provider
-    my $res = $Ua->get( $request->to_url );
+    return $request;
+}
 
+
+sub _perform_boss_request {
+    my ($self, $request) = @_;
+
+    my $res = $self->ua->get( $request->to_url );
     unless ( $res->is_success ) {
-
-        die "bad response: " . Dumper($res);
+        my $url = $request->to_url;
+        die "bad response from $url: " . Dumper($res);
     }
+    return $res->decoded_content;
+}
 
-    my $response =
-      WebService::Yahoo::BOSS::Response->parse( $res->decoded_content );
+
+sub _parse_boss_response {
+    my ($self, $response_content, $result_class) = @_;
+    return WebService::Yahoo::BOSS::Response->parse( $response_content, 'WebService::Yahoo::BOSS::Response::Web' );
+}
+
+
+sub ask_boss {
+    my ($self, $api_path, $args, $result_class) = @_;
+
+    my $request = $self->_create_boss_request($api_path, $args);
+    my $response_content = $self->_perform_boss_request($request);
+    my $response = $self->_parse_boss_response($response_content, $result_class);
 
     return $response;
+}
+
+
+sub Web {
+    my ( $self, %args ) = @_;
+
+    croak "q parameter not defined"
+        unless defined $args{q};
+
+    $args{count} ||= 10;
+    $args{filter} ||= '-porn';
+    $args{format} ||= 'json';
+    croak 'only json format supported'
+        unless $args{format} eq 'json';
+
+    return $self->ask_boss('/ysearch/web', \%args, 'WebService::Yahoo::BOSS::Response::Web');
 }
 
 1;
