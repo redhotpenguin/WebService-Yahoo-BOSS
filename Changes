@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-Yahoo-BOSS.
 
+1.01  Thu Apr 24 2013
+    - Updated MANIFEST and added MANIFEST.SKIP
+
 1.00  Thu Apr 24 2013
     - Fixed breaking bug in 0.08 [Tim Bunce]
     - Significant refactoring [Tim Bunce]
