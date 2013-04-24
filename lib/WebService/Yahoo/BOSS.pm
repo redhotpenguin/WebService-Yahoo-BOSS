@@ -2,7 +2,46 @@ package WebService::Yahoo::BOSS;
 
 =head1 NAME
 
-WebService::Yahoo::BOSS - Interface to the Yahoo BOSS API
+WebService::Yahoo::BOSS - Interface to the Yahoo BOSS Search API
+
+=head1 SYNOPSIS
+
+    use WebService::Yahoo::BOSS;
+
+    $Boss = WebService::Yahoo::BOSS->new( ckey => $ckey, csecret => $csecret );
+
+    $response = $Boss->Web( q => 'microbrew award winner 2010', ... );
+
+    $response = $Boss->PlaceFinder( q => 'Fleet Street, London', ... );
+
+
+=head1 DESCRIPTION
+
+Provides an interface to the Yahoo BOSS (Build Your Own Search) web service API.
+
+Mad props to Yahoo for putting out a premium search api which encourages
+innovative use.
+
+This is a work in progress, so patches welcome!
+
+=head2 Interaction
+
+Each service has a corresponding method call. The call takes the same
+parameters as described in the Yahoo BOSS documentation.
+
+Each method returns a L<WebService::Yahoo::BOSS::Response> object that has the
+following methods:
+
+    $response->totalresults; # total number of available results
+    $response->count;        # number of results in this set
+    $response->start;        # typically same as start argument in request
+    $response->results;      # reference to array of result objects
+
+The result objects accessed via the C<results> methods are instances of
+a C<WebService::Yahoo::BOSS::Response::*> class that corresponds to the method
+called.
+
+=head1 METHODS
 
 =cut
 
@@ -17,13 +56,27 @@ use Data::UUID;
 use Carp qw(croak);
 
 use WebService::Yahoo::BOSS::Response;
-use WebService::Yahoo::BOSS::Response::Web;
 
-our $VERSION = '0.08';
+
+our $VERSION = '1.00';
 
 my $Ug = Data::UUID->new;
 
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
+
+
+=head2 new
+
+    $boss = WebService::Yahoo::BOSS->new(
+        # required
+        ckey => $ckey,
+        csecret => $csecret,
+        # optional
+        url => 'http://yboss.yahooapis.com',
+        ua => LWP::UserAgent->new(...),
+    );
+
+=cut
 
 has 'ckey'    => ( is => 'ro', required => 1 );
 has 'csecret' => ( is => 'ro', required => 1 );
@@ -71,8 +124,8 @@ sub _perform_boss_request {
 
     my $res = $self->ua->get( $request->to_url );
     unless ( $res->is_success ) {
-        my $url = $request->to_url;
-        die "bad response from $url: " . Dumper($res);
+        die sprintf "%s requesting %s: %s",
+            $res->status_line, $request->to_url, Dumper($res);
     }
     return $res->decoded_content;
 }
@@ -80,7 +133,7 @@ sub _perform_boss_request {
 
 sub _parse_boss_response {
     my ($self, $response_content, $result_class) = @_;
-    return WebService::Yahoo::BOSS::Response->parse( $response_content, 'WebService::Yahoo::BOSS::Response::Web' );
+    return WebService::Yahoo::BOSS::Response->parse( $response_content, $result_class );
 }
 
 
@@ -94,6 +147,18 @@ sub ask_boss {
     return $response;
 }
 
+=head2 Web
+
+    $response = $Boss->Web( q       => 'microbrew award winner 2010',
+                            start   => 0,
+                            exclude => 'pilsner', );
+
+For more information about the arguments and result attributes see
+L<http://developer.yahoo.com/boss/search/boss_api_guide/webv2_service.html>
+
+The results are L<WebService::Yahoo::BOSS::Response::Web> objects.
+
+=cut
 
 sub Web {
     my ( $self, %args ) = @_;
@@ -110,29 +175,30 @@ sub Web {
     return $self->ask_boss('/ysearch/web', \%args, 'WebService::Yahoo::BOSS::Response::Web');
 }
 
+
+=head2 PlaceFinder
+
+    $response = $boss->PlaceFinder(
+        q => '701 First Ave., Sunnyvale, CA 94089',
+    );
+
+For more information about the arguments and result attributes see
+L<http://developer.yahoo.com/boss/geo/docs/requests-pf.html>
+
+The results are L<WebService::Yahoo::BOSS::Response::PlaceFinder> objects.
+
+=cut
+
+sub PlaceFinder {
+    my ( $self, %args ) = @_;
+
+    $args{flags} .= "J"; # JSON
+
+    return $self->ask_boss('/geo/placefinder', \%args, 'WebService::Yahoo::BOSS::Response::PlaceFinder');
+}
+
+
 1;
-
-=head1 SYNOPSIS
-
- use WebService::Yahoo::BOSS;
-
- $Boss = WebService::Yahoo::BOSS->new( ckey => $ckey, csecret => $csecret );
-
- $res = $Boss->Web( q       => 'microbrew award winner 2010',
-                    start   => 0,
-                    exclude => 'pilsner', );
-
- # see source for result attributes
-
-=head1 DESCRIPTION
-
-This API wraps the Yahoo BOSS (Build Your Own Search) web service API.
-
-Mad props to Yahoo for putting out a premium search api which encourages
-innovative use.
-
-For more information check out the following links.  This is a work in
-progress, so patches welcome!
 
 =head1 SEE ALSO
 
@@ -143,6 +209,8 @@ progress, so patches welcome!
 =head1 AUTHOR
 
 "Fred Moyer", E<lt>fred@slwifi.comE<gt>
+
+The PlaceFinder service, and general refactoring and optimization, by Tim Bunce.
 
 =head1 COPYRIGHT AND LICENSE
 
