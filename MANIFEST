@@ -1,9 +1,13 @@
 Changes
-Makefile.PL
-MANIFEST
-README
-t/WebService-Yahoo-BOSS.t
 lib/WebService/Yahoo/BOSS.pm
 lib/WebService/Yahoo/BOSS/Response.pm
+lib/WebService/Yahoo/BOSS/Response/PlaceFinder.pm
 lib/WebService/Yahoo/BOSS/Response/Web.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00-load.t
+t/10-web.t
+t/20-placefinder.t
+t/prologue.pl
