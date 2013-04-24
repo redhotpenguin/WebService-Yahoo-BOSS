@@ -46,7 +46,7 @@ sub Web {
     }
 
     $args{format} ||= 'json';
-    $args{count} || = 10;
+    $args{count} ||= 10;
     die 'only json format supported, xml patches welcome'
       unless $args{format} eq 'json';
 
