@@ -6,19 +6,16 @@ WebService::Yahoo::BOSS::Response - Response class for Yahoo BOSS searches
 
 =cut
 
-use strict;
-use warnings;
-
-use Any::Moose;
+use Moo;
 use JSON::XS ();
 use Data::Dumper;
 
 use WebService::Yahoo::BOSS::Response::Web;
 
-has 'count'        => ( is => 'ro', isa => 'Int',              required => 1 );
-has 'totalresults' => ( is => 'ro', isa => 'Int',              required => 1 );
-has 'start'        => ( is => 'ro', isa => 'Int',              required => 1 );
-has 'results'      => ( is => 'ro', isa => 'ArrayRef[Object]', required => 1 );
+has 'count'        => ( is => 'ro', required => 1 );
+has 'totalresults' => ( is => 'ro', required => 1 );
+has 'start'        => ( is => 'ro', required => 1 );
+has 'results'      => ( is => 'ro', required => 1 );
 
 sub parse {
     my ( $class, $content ) = @_;

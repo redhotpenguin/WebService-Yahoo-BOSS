@@ -9,7 +9,7 @@ WriteMakefile(
     NAME         => 'WebService::Yahoo::BOSS',
     VERSION_FROM => 'lib/WebService/Yahoo/BOSS.pm',
     PREREQ_PM    => {
-        'Any::Moose'       => 0,
+        'Moo'              => '1.001000',
         'Any::URI::Escape' => 0,
         'LWP::UserAgent'   => 0,
         'Net::OAuth'       => 0.27,

@@ -6,17 +6,14 @@ WebService::Yahoo::BOSS::Response::Web
 
 =cut
 
-use strict;
-use warnings;
+use Moo;
 
-use Any::Moose;
-
-has 'abstract' => ( is => 'rw', isa => 'Str', required => 1 );
-has 'date'     => ( is => 'ro', isa => 'Str', required => 1 );
-has 'dispurl'  => ( is => 'ro', isa => 'Str', required => 1 );
-has 'title'    => ( is => 'rw', isa => 'Str', required => 1 );
-has 'url'      => ( is => 'ro', isa => 'Str', required => 1 );
-has 'clickurl' => ( is => 'ro', isa => 'Str', required => 1 );
+has 'abstract' => ( is => 'rw', required => 1 );
+has 'date'     => ( is => 'ro', required => 1 );
+has 'dispurl'  => ( is => 'ro', required => 1 );
+has 'title'    => ( is => 'rw', required => 1 );
+has 'url'      => ( is => 'ro', required => 1 );
+has 'clickurl' => ( is => 'ro', required => 1 );
 
 
 1;
