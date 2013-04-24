@@ -58,7 +58,7 @@ use Carp qw(croak);
 use WebService::Yahoo::BOSS::Response;
 
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 my $Ug = Data::UUID->new;
 

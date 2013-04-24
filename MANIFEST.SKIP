@@ -1,0 +1,10 @@
+^MANIFEST\.
+^Makefile$
+~$
+^\.travis\.yml
+^\.git
+\.old$
+^blib/
+pm_to_blib
+^MYMETA\.
+^WebService-Yahoo-BOSS-
