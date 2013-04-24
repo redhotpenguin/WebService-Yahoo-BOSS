@@ -6,10 +6,7 @@ WebService::Yahoo::BOSS - Interface to the Yahoo BOSS API
 
 =cut
 
-use strict;
-use warnings;
-
-use Any::Moose;
+use Moo;
 use Any::URI::Escape;
 use LWP::UserAgent;
 use URI;
@@ -29,11 +26,10 @@ my $Ug = Data::UUID->new;
 
 $Net::OAuth::PROTOCOL_VERSION = Net::OAuth::PROTOCOL_VERSION_1_0A;
 
-has 'ckey'    => ( is => 'ro', isa => 'Str', required => 1 );
-has 'csecret' => ( is => 'ro', isa => 'Str', required => 1 );
+has 'ckey'    => ( is => 'ro', required => 1 );
+has 'csecret' => ( is => 'ro', required => 1 );
 has 'url'     => (
     is       => 'ro',
-    isa      => 'Str',
     required => 1,
     default  => $Api_base,
 );
@@ -46,7 +42,7 @@ sub Web {
     }
 
     $args{format} ||= 'json';
-    $args{count} || = 10;
+    $args{count} ||= 10;
     die 'only json format supported, xml patches welcome'
       unless $args{format} eq 'json';
 
